@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+message PrexMessage {
+    enum MessageType {
+        LOAD_PROGRAM = 0;
+        IO = 1;
+        IMAGE = 2;
+    }
+
+    MessageType type = 1;
+    bytes payload = 2;
+}
+
+message LoadProgram {
+    string filename = 1;
+    string code = 2;
+    repeated string argv = 3;
+}
+
+message Io {
+    enum FD {
+        STDIN = 0;
+        STDOUT = 1;
+        STDERR = 2;
+    }
+    FD type = 1;
+    bytes data = 2;
+}
+
+message Image {
+    bytes payload = 1;
+}
