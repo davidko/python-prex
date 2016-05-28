@@ -41,7 +41,7 @@ class PrexTerm():
                 if msg.type == message_pb2.PrexMessage.IO:
                     io = message_pb2.Io()
                     io.ParseFromString(msg.payload)
-                    print(io.data)
+                    print(io.data.decode())
             except websockets.exceptions.ConnectionClosed:
                 return
 

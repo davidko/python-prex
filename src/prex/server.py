@@ -6,6 +6,7 @@ import asyncio
 import functools
 import logging
 import os
+import shutil
 import tempfile
 import websockets
 from . import message_pb2
@@ -64,6 +65,7 @@ class _Connection():
         print('argv: ', obj.argv)
         # Save the code to a temporary dir
         tmpdir = tempfile.mkdtemp()
+        self.tmpdir = tmpdir
         filepath = os.path.join(tmpdir, obj.filename)
         logging.info('Opening temp file at:' + filepath)
         with open(filepath, 'w') as f:
@@ -83,6 +85,7 @@ class _Connection():
     async def check_program_end(self):
         await self.exit_future
         await self.protocol.close()
+        shutil.rmtree(self.tmpdir)
         logging.info('Closed protocol, subprocess.')
 
     async def handle_io(self, payload):
