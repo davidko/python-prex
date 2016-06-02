@@ -18,6 +18,7 @@ setup (name = 'prex',
        long_description = README,
        package_dir = {'':'src'},
        packages = ['prex', ],
+       scripts = ['bin/prex-server.py', ],
        url = 'http://github.com/BaroboRobotics/prex',
        install_requires=[
            'protobuf==3.0.0b3',
