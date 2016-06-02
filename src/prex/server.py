@@ -128,14 +128,14 @@ class _ExecProtocol(asyncio.SubprocessProtocol):
         self.exit_future.set_result(True)
 
 @asyncio.coroutine
-def main(host='localhost', port=43000):
+def run(host='localhost', port=43000):
     server = yield from Server.create(host, port)
     print('Server started: ', host, ':', port)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+    loop.run_until_complete(run())
     loop.run_forever()
     loop.close()
     
