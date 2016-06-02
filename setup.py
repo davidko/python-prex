@@ -5,8 +5,8 @@ import os
 from setuptools import setup
 import sys
 
-if sys.version_info < (3, 5):
-    raise Exception('Python 3.5 or higher is required to use prex.')
+if sys.version_info < (3, 4, 2):
+    raise Exception('Python 3.4.2 or higher is required to use prex.')
 
 here = os.path.abspath(os.path.dirname(__file__))
 README = codecs.open(os.path.join(here, 'README.txt'), encoding='utf8').read()

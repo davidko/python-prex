@@ -7,38 +7,45 @@ import functools
 import logging
 import os
 import shutil
+import sys
 import tempfile
 import websockets
 from . import message_pb2
 
+if sys.version_info < (3,4,4):
+    asyncio.ensure_future = asyncio.async
 
 class Server():
     @classmethod
-    async def create(cls, host='localhost', port=43000):
+    @asyncio.coroutine
+    def create(cls, host='localhost', port=43000):
         self = cls()
-        self.server = await websockets.serve(self.ws_handler, host, port)
+        self.server = yield from websockets.serve(self.ws_handler, host, port)
         return self
 
-    async def ws_handler(self, protocol, uri):
+    @asyncio.coroutine
+    def ws_handler(self, protocol, uri):
         logging.info('Received connection: ' + uri)
         self.connection = _Connection(protocol, uri)
-        await self.connection.consumer()
+        yield from self.connection.consumer()
         
 class _Connection():
     def __init__(self, protocol, uri):
         self.protocol = protocol
         self.uri = uri
 
-    async def consumer(self):    
+    @asyncio.coroutine
+    def consumer(self):    
         while True:
             logging.info('Waiting for message...')
             try:
-                message = await self.protocol.recv()
-                await self.consumer_handler(message)
+                message = yield from self.protocol.recv()
+                yield from self.consumer_handler(message)
             except websockets.exceptions.ConnectionClosed:
                 return
-
-    async def consumer_handler(self, payload):
+    
+    @asyncio.coroutine
+    def consumer_handler(self, payload):
         # Parse the message
         msg = message_pb2.PrexMessage()
         logging.info('Got a message: ' + str(msg.type) + str(payload))
@@ -46,7 +53,7 @@ class _Connection():
             msg.ParseFromString(payload)
         except Exception:
             logging.warn('Could not parse incoming message...')
-            await self.protocol.send('ERR: Invalid format')
+            yield from self.protocol.send('ERR: Invalid format')
             return
 
         handlers = {
@@ -55,9 +62,10 @@ class _Connection():
             message_pb2.PrexMessage.IMAGE : self.handle_image,
         }
 
-        await handlers[msg.type](msg.payload)
-       
-    async def handle_load_program(self, payload):
+        yield from handlers[msg.type](msg.payload)
+    
+    @asyncio.coroutine   
+    def handle_load_program(self, payload):
         obj = message_pb2.LoadProgram()
         obj.ParseFromString(payload)
         print('Load program. Filename: ', obj.filename) 
@@ -79,22 +87,25 @@ class _Connection():
                 functools.partial(_ExecProtocol, exit_future, self.protocol),
                 '/usr/bin/python3', 
                 filepath)
-            self.exec_transport, self.exec_protocol = await create
+            self.exec_transport, self.exec_protocol = yield from create
             asyncio.ensure_future(self.check_program_end())
 
-    async def check_program_end(self):
-        await self.exit_future
-        await self.protocol.close()
+    @asyncio.coroutine
+    def check_program_end(self):
+        yield from self.exit_future
+        yield from self.protocol.close()
         shutil.rmtree(self.tmpdir)
         logging.info('Closed protocol, subprocess.')
 
-    async def handle_io(self, payload):
+    @asyncio.coroutine
+    def handle_io(self, payload):
         obj = message_pb2.Io()
         obj.ParseFromString(payload)
         logging.info('Received IO from client: ' + str(obj.data))
         self.exec_transport.get_pipe_transport(0).write(obj.data)
 
-    async def handle_image(self, payload):
+    @asyncio.coroutine
+    def handle_image(self, payload):
         pass
 
 class _ExecProtocol(asyncio.SubprocessProtocol):
@@ -116,8 +127,9 @@ class _ExecProtocol(asyncio.SubprocessProtocol):
         logging.info('Process exited.')
         self.exit_future.set_result(True)
 
-async def main(host='localhost', port=43000):
-    server = await Server.create(host, port)
+@asyncio.coroutine
+def main(host='localhost', port=43000):
+    server = yield from Server.create(host, port)
     print('Server started: ', host, ':', port)
 
 if __name__ == '__main__':
