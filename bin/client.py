@@ -2,7 +2,7 @@
 
 import asyncio
 import websockets
-import message_pb2
+import prex.message_pb2 as message_pb2
 import sys
 import logging
 
