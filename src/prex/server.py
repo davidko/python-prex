@@ -26,8 +26,8 @@ class Server():
     @asyncio.coroutine
     def ws_handler(self, protocol, uri):
         logging.info('Received connection: ' + uri)
-        self.connection = _Connection(protocol, uri)
-        yield from self.connection.consumer()
+        connection = _Connection(protocol, uri)
+        yield from connection.consumer()
         
 class _Connection():
     def __init__(self, protocol, uri):
