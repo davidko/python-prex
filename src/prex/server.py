@@ -45,6 +45,7 @@ class _Connection():
                 message = yield from self.protocol.recv()
                 yield from self.consumer_handler(message)
             except websockets.exceptions.ConnectionClosed:
+                yield from self.handle_terminate(None)
                 return
     
     @asyncio.coroutine
@@ -97,7 +98,8 @@ class _Connection():
     @asyncio.coroutine
     def check_program_end(self):
         try:
-            yield from asyncio.shield(asyncio.wait_for(self.exit_future, self.PROGRAM_TIMEOUT))
+            yield from asyncio.shield(
+                asyncio.wait_for(self.exit_future, self.PROGRAM_TIMEOUT))
         except asyncio.TimeoutError:
             pass
         yield from self.protocol.close()
