@@ -122,7 +122,6 @@ class _Connection():
         logging.info('Terminating process...')
         self.exec_transport.kill()
 
-
 class _ExecProtocol(asyncio.SubprocessProtocol):
     def __init__(self, exit_future, ws_protocol):
         self.exit_future = exit_future
