@@ -30,6 +30,9 @@ class Server():
         yield from connection.consumer()
         
 class _Connection():
+
+    PROGRAM_TIMEOUT = 60*60 # Seconds to allow child programs to continue running
+
     def __init__(self, protocol, uri):
         self.protocol = protocol
         self.uri = uri
@@ -60,6 +63,7 @@ class _Connection():
             message_pb2.PrexMessage.LOAD_PROGRAM : self.handle_load_program,
             message_pb2.PrexMessage.IO : self.handle_io,
             message_pb2.PrexMessage.IMAGE : self.handle_image,
+            message_pb2.PrexMessage.TERMINATE : self.handle_terminate,
         }
 
         yield from handlers[msg.type](msg.payload)
@@ -68,9 +72,9 @@ class _Connection():
     def handle_load_program(self, payload):
         obj = message_pb2.LoadProgram()
         obj.ParseFromString(payload)
-        print('Load program. Filename: ', obj.filename) 
-        print('Code: ', obj.code)
-        print('argv: ', obj.argv)
+        logging.info('Load program. Filename: ' + obj.filename) 
+        logging.info('Code: ' + obj.code)
+        logging.info('argv: ' + str(obj.argv))
         # Save the code to a temporary dir
         tmpdir = tempfile.mkdtemp()
         self.tmpdir = tmpdir
@@ -92,7 +96,10 @@ class _Connection():
 
     @asyncio.coroutine
     def check_program_end(self):
-        yield from self.exit_future
+        try:
+            yield from asyncio.shield(asyncio.wait_for(self.exit_future, self.PROGRAM_TIMEOUT))
+        except asyncio.TimeoutError:
+            pass
         yield from self.protocol.close()
         shutil.rmtree(self.tmpdir)
         logging.info('Closed protocol, subprocess.')
@@ -107,6 +114,12 @@ class _Connection():
     @asyncio.coroutine
     def handle_image(self, payload):
         pass
+
+    @asyncio.coroutine
+    def handle_terminate(self, payload):
+        logging.info('Terminating process...')
+        self.exec_transport.kill()
+
 
 class _ExecProtocol(asyncio.SubprocessProtocol):
     def __init__(self, exit_future, ws_protocol):

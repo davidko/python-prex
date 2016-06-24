@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='message.proto',
   package='',
   syntax='proto3',
-  serialized_pb=_b('\n\rmessage.proto\"z\n\x0bPrexMessage\x12&\n\x04type\x18\x01 \x01(\x0e\x32\x18.PrexMessage.MessageType\x12\x0f\n\x07payload\x18\x02 \x01(\x0c\"2\n\x0bMessageType\x12\x10\n\x0cLOAD_PROGRAM\x10\x00\x12\x06\n\x02IO\x10\x01\x12\t\n\x05IMAGE\x10\x02\";\n\x0bLoadProgram\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x0c\n\x04\x63ode\x18\x02 \x01(\t\x12\x0c\n\x04\x61rgv\x18\x03 \x03(\t\"Q\n\x02Io\x12\x14\n\x04type\x18\x01 \x01(\x0e\x32\x06.Io.FD\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"\'\n\x02\x46\x44\x12\t\n\x05STDIN\x10\x00\x12\n\n\x06STDOUT\x10\x01\x12\n\n\x06STDERR\x10\x02\"\x18\n\x05Image\x12\x0f\n\x07payload\x18\x01 \x01(\x0c\x62\x06proto3')
+  serialized_pb=_b('\n\rmessage.proto\"\x89\x01\n\x0bPrexMessage\x12&\n\x04type\x18\x01 \x01(\x0e\x32\x18.PrexMessage.MessageType\x12\x0f\n\x07payload\x18\x02 \x01(\x0c\"A\n\x0bMessageType\x12\x10\n\x0cLOAD_PROGRAM\x10\x00\x12\x06\n\x02IO\x10\x01\x12\t\n\x05IMAGE\x10\x02\x12\r\n\tTERMINATE\x10\x03\";\n\x0bLoadProgram\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x0c\n\x04\x63ode\x18\x02 \x01(\t\x12\x0c\n\x04\x61rgv\x18\x03 \x03(\t\"Q\n\x02Io\x12\x14\n\x04type\x18\x01 \x01(\x0e\x32\x06.Io.FD\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"\'\n\x02\x46\x44\x12\t\n\x05STDIN\x10\x00\x12\n\n\x06STDOUT\x10\x01\x12\n\n\x06STDERR\x10\x02\"\x18\n\x05Image\x12\x0f\n\x07payload\x18\x01 \x01(\x0c\x62\x06proto3')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -43,11 +43,15 @@ _PREXMESSAGE_MESSAGETYPE = _descriptor.EnumDescriptor(
       name='IMAGE', index=2, number=2,
       options=None,
       type=None),
+    _descriptor.EnumValueDescriptor(
+      name='TERMINATE', index=3, number=3,
+      options=None,
+      type=None),
   ],
   containing_type=None,
   options=None,
-  serialized_start=89,
-  serialized_end=139,
+  serialized_start=90,
+  serialized_end=155,
 )
 _sym_db.RegisterEnumDescriptor(_PREXMESSAGE_MESSAGETYPE)
 
@@ -72,8 +76,8 @@ _IO_FD = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=244,
-  serialized_end=283,
+  serialized_start=260,
+  serialized_end=299,
 )
 _sym_db.RegisterEnumDescriptor(_IO_FD)
 
@@ -112,8 +116,8 @@ _PREXMESSAGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=17,
-  serialized_end=139,
+  serialized_start=18,
+  serialized_end=155,
 )
 
 
@@ -157,8 +161,8 @@ _LOADPROGRAM = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=141,
-  serialized_end=200,
+  serialized_start=157,
+  serialized_end=216,
 )
 
 
@@ -196,8 +200,8 @@ _IO = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=202,
-  serialized_end=283,
+  serialized_start=218,
+  serialized_end=299,
 )
 
 
@@ -227,8 +231,8 @@ _IMAGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=285,
-  serialized_end=309,
+  serialized_start=301,
+  serialized_end=325,
 )
 
 _PREXMESSAGE.fields_by_name['type'].enum_type = _PREXMESSAGE_MESSAGETYPE

@@ -5,6 +5,7 @@ message PrexMessage {
         LOAD_PROGRAM = 0;
         IO = 1;
         IMAGE = 2;
+        TERMINATE=3;
     }
 
     MessageType type = 1;
