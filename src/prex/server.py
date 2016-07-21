@@ -88,10 +88,12 @@ class _Connection():
             exit_future = asyncio.Future()
             self.exit_future = exit_future
             logging.info('Starting subprocess...')
+            args = ['/usr/bin/python3', filepath]
+            for arg in obj.argv:
+                args += [arg]
             create = loop.subprocess_exec(
                 functools.partial(_ExecProtocol, exit_future, self.protocol),
-                '/usr/bin/python3', 
-                filepath)
+                *args)
             self.exec_transport, self.exec_protocol = yield from create
             asyncio.ensure_future(self.check_program_end())
 
