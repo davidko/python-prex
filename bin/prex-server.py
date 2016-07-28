@@ -5,7 +5,7 @@ import prex
 import argparse
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
 #asyncio.get_event_loop().set_debug(True)
 
 parser = argparse.ArgumentParser()
