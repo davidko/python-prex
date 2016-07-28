@@ -122,7 +122,8 @@ class _Connection():
     @asyncio.coroutine
     def handle_terminate(self, payload):
         logging.info('Terminating process...')
-        self.exec_transport.kill()
+        if self.exec_transport is not None:
+            self.exec_transport.kill()
 
 class _ExecProtocol(asyncio.SubprocessProtocol):
     def __init__(self, exit_future, ws_protocol):
