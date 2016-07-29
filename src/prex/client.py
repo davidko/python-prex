@@ -45,6 +45,10 @@ class SimpleTerm():
                     io = message_pb2.Io()
                     io.ParseFromString(msg.payload)
                     print(io.data.decode())
+                if msg.type == message_pb2.PrexMessage.IMAGE:
+                    image = message_pb2.Image()
+                    image.ParseFromString(msg.payload)
+                    print('Received {} bytes of image data.'.format(len(image.payload)))
             except websockets.exceptions.ConnectionClosed:
                 return
     @asyncio.coroutine

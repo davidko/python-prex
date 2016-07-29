@@ -81,6 +81,10 @@ class _Connection():
         self.tmpdir = tmpdir
         filepath = os.path.join(tmpdir, obj.filename)
         logging.info('Opening temp file at:' + filepath)
+
+        # Start the interprocess communications channel
+        self.ipc_server = yield from _ChildProcessWsServer.create(self.protocol)
+
         with open(filepath, 'w') as f:
             f.write(obj.code)
             f.flush()
@@ -88,12 +92,16 @@ class _Connection():
             exit_future = asyncio.Future()
             self.exit_future = exit_future
             logging.info('Starting subprocess...')
-            args = ['/usr/bin/python3', filepath]
+            args = ['python3', filepath]
             for arg in obj.argv:
                 args += [arg]
             create = loop.subprocess_exec(
                 functools.partial(_ExecProtocol, exit_future, self.protocol),
-                *args)
+                *args,
+                env={
+                     'PREX_IPC_PORT':str(self.ipc_server.port),
+                     'PATH':os.environ['PATH'],
+                    })
             self.exec_transport, self.exec_protocol = yield from create
             asyncio.ensure_future(self.check_program_end())
 
@@ -117,13 +125,55 @@ class _Connection():
 
     @asyncio.coroutine
     def handle_image(self, payload):
-        pass
+        logging.info('Server received {} bytes of image data.'.format(len(payload)))
 
     @asyncio.coroutine
     def handle_terminate(self, payload):
         logging.info('Terminating process...')
         if self.exec_transport is not None:
             self.exec_transport.kill()
+
+# This WS server receives communications from the child process. For instance,
+# the child process can send an image to the client application by sending it
+# to this server.
+class _ChildProcessWsServer():
+    @classmethod
+    @asyncio.coroutine
+    def create(cls, client_app_protocol, host='localhost', port=0):
+        self = cls()
+        self.client_app_protocol = client_app_protocol
+        self.server = yield from websockets.serve(self.ws_handler, host, port)
+        _, self.port = self.server.server.sockets[0].getsockname()
+        return self
+
+    @asyncio.coroutine
+    def ws_handler(self, protocol, uri):
+        logging.info('Received connection: ' + uri)
+        connection = _ChildProcessConnection(protocol, uri, self.client_app_protocol)
+        yield from connection.consumer()
+
+class _ChildProcessConnection():
+    def __init__(self, protocol, uri, client_app_protocol):
+        self.protocol = protocol
+        self.uri = uri
+        self.client_app_protocol = client_app_protocol
+
+    @asyncio.coroutine
+    def consumer(self):    
+        while True:
+            logging.info('Waiting for message...')
+            try:
+                message = yield from self.protocol.recv()
+                # Pack message into an "IMAGE" message and forward up to client
+                # app
+                msg = message_pb2.Image()
+                msg.payload = message
+                packet = message_pb2.PrexMessage()
+                packet.type = message_pb2.PrexMessage.IMAGE
+                packet.payload = msg.SerializeToString()
+                yield from self.client_app_protocol.send(packet.SerializeToString())
+            except websockets.exceptions.ConnectionClosed:
+                return
 
 class _ExecProtocol(asyncio.SubprocessProtocol):
     def __init__(self, exit_future, ws_protocol):
