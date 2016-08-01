@@ -164,14 +164,8 @@ class _ChildProcessConnection():
             logging.info('Waiting for message...')
             try:
                 message = yield from self.protocol.recv()
-                # Pack message into an "IMAGE" message and forward up to client
-                # app
-                msg = message_pb2.Image()
-                msg.payload = message
-                packet = message_pb2.PrexMessage()
-                packet.type = message_pb2.PrexMessage.IMAGE
-                packet.payload = msg.SerializeToString()
-                yield from self.client_app_protocol.send(packet.SerializeToString())
+                # Forward the message directly back up to the client
+                yield from self.client_app_protocol.send(message)
             except websockets.exceptions.ConnectionClosed:
                 return
 

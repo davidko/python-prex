@@ -44,7 +44,7 @@ class SimpleTerm():
                 if msg.type == message_pb2.PrexMessage.IO:
                     io = message_pb2.Io()
                     io.ParseFromString(msg.payload)
-                    print(io.data.decode())
+                    print('> '+io.data.decode())
                 if msg.type == message_pb2.PrexMessage.IMAGE:
                     image = message_pb2.Image()
                     image.ParseFromString(msg.payload)
