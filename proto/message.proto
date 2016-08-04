@@ -6,6 +6,7 @@ message PrexMessage {
         IO = 1;
         IMAGE = 2;
         TERMINATE=3;
+        TERMINATE_ALL=4;
     }
 
     MessageType type = 1;
@@ -16,6 +17,7 @@ message LoadProgram {
     string filename = 1;
     string code = 2;
     repeated string argv = 3;
+    string interpreter = 4;
 }
 
 message Io {
@@ -30,4 +32,5 @@ message Io {
 
 message Image {
     bytes payload = 1;
+    string format = 2;
 }

@@ -21,19 +21,22 @@ class Server():
     def create(cls, host='localhost', port=43000):
         self = cls()
         self.server = yield from websockets.serve(self.ws_handler, host, port)
+        self.connections = {}
         return self
 
     @asyncio.coroutine
     def ws_handler(self, protocol, uri):
-        logging.info('Received connection: ' + uri)
-        connection = _Connection(protocol, uri)
+        logging.info('Received connection: ' + str(protocol.remote_address))
+        connection = _Connection(self, protocol, uri)
+        self.connections[protocol.remote_address] = connection
         yield from connection.consumer()
         
 class _Connection():
 
     PROGRAM_TIMEOUT = 60*60 # Seconds to allow child programs to continue running
 
-    def __init__(self, protocol, uri):
+    def __init__(self, server, protocol, uri):
+        self._server = server
         self.protocol = protocol
         self.uri = uri
 
@@ -65,6 +68,7 @@ class _Connection():
             message_pb2.PrexMessage.IO : self.handle_io,
             message_pb2.PrexMessage.IMAGE : self.handle_image,
             message_pb2.PrexMessage.TERMINATE : self.handle_terminate,
+            message_pb2.PrexMessage.TERMINATE_ALL : self.handle_terminate_all,
         }
 
         yield from handlers[msg.type](msg.payload)
@@ -132,6 +136,20 @@ class _Connection():
         logging.info('Terminating process...')
         if self.exec_transport is not None:
             self.exec_transport.kill()
+            self.exec_transport = None
+        try:
+            del self._server.connections[self.uri]
+        except KeyError:
+            pass
+
+    @asyncio.coroutine
+    def handle_terminate_all(self, payload):
+        # terminate all other processes
+        while len(self._server.connections) > 0:
+            logging.info('Num Connections: {}'.format(len(self._server.connections)))
+            k, i = self._server.connections.popitem()
+            logging.info('Terminating uri: {}'.format(k))
+            yield from i.handle_terminate(None)
 
 # This WS server receives communications from the child process. For instance,
 # the child process can send an image to the client application by sending it
