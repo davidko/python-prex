@@ -26,9 +26,9 @@ class Server():
 
     @asyncio.coroutine
     def ws_handler(self, protocol, uri):
-        logging.info('Received connection: ' + uri)
+        logging.info('Received connection: ' + str(protocol.remote_address))
         connection = _Connection(self, protocol, uri)
-        self.connections[uri] = connection
+        self.connections[protocol.remote_address] = connection
         yield from connection.consumer()
         
 class _Connection():
@@ -71,10 +71,7 @@ class _Connection():
             message_pb2.PrexMessage.TERMINATE_ALL : self.handle_terminate_all,
         }
 
-        if msg.HasField('payload'):
-            yield from handlers[msg.type](msg.payload)
-        else:
-            yield from handlers[msg.type]()
+        yield from handlers[msg.type](msg.payload)
     
     @asyncio.coroutine   
     def handle_load_program(self, payload):
@@ -135,20 +132,24 @@ class _Connection():
         logging.info('Server received {} bytes of image data.'.format(len(payload)))
 
     @asyncio.coroutine
-    def handle_terminate(self):
+    def handle_terminate(self, payload):
         logging.info('Terminating process...')
         if self.exec_transport is not None:
             self.exec_transport.kill()
-        del self._server.connections[self.uri]
+            self.exec_transport = None
+        try:
+            del self._server.connections[self.uri]
+        except KeyError:
+            pass
 
     @asyncio.coroutine
-    def handle_terminate_all(self):
-        # First, terminate ourselves
-        yield from self.handle_terminate()
-        # Now, terminate all other processes
+    def handle_terminate_all(self, payload):
+        # terminate all other processes
         while len(self._server.connections) > 0:
+            logging.info('Num Connections: {}'.format(len(self._server.connections)))
             k, i = self._server.connections.popitem()
-            yield from i.handle_terminate()
+            logging.info('Terminating uri: {}'.format(k))
+            yield from i.handle_terminate(None)
 
 # This WS server receives communications from the child process. For instance,
 # the child process can send an image to the client application by sending it

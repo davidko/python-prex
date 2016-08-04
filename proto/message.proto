@@ -10,14 +10,14 @@ message PrexMessage {
     }
 
     MessageType type = 1;
-    optional bytes payload = 2;
+    bytes payload = 2;
 }
 
 message LoadProgram {
     string filename = 1;
     string code = 2;
     repeated string argv = 3;
-    optional string interpreter = 4;
+    string interpreter = 4;
 }
 
 message Io {
@@ -32,5 +32,5 @@ message Io {
 
 message Image {
     bytes payload = 1;
-    optional string format = 2;
+    string format = 2;
 }

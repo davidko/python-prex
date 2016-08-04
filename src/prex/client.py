@@ -34,6 +34,12 @@ class SimpleTerm():
             raise
 
     @asyncio.coroutine
+    def terminate_all(self):
+        message = message_pb2.PrexMessage()
+        message.type = message_pb2.PrexMessage.TERMINATE_ALL
+        yield from self.ws_protocol.send(message.SerializeToString())
+
+    @asyncio.coroutine
     def consumer(self):
         while True:
             try:
@@ -44,7 +50,7 @@ class SimpleTerm():
                 if msg.type == message_pb2.PrexMessage.IO:
                     io = message_pb2.Io()
                     io.ParseFromString(msg.payload)
-                    print('> '+io.data.decode())
+                    print(io.data.decode(), end='', flush=True)
                 if msg.type == message_pb2.PrexMessage.IMAGE:
                     image = message_pb2.Image()
                     image.ParseFromString(msg.payload)
