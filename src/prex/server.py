@@ -171,7 +171,9 @@ class _ChildProcessWsServer():
         self = cls()
         self.client_app_protocol = client_app_protocol
         self.server = yield from websockets.serve(self.ws_handler, host, port)
-        _, self.port = self.server.server.sockets[0].getsockname()
+        #_, self.port = self.server.server.sockets[0].getsockname()
+        hostport = self.server.server.sockets[0].getsockname()
+        self.port = hostport[1]
         return self
 
     @asyncio.coroutine
