@@ -116,9 +116,15 @@ class _Connection():
                 asyncio.wait_for(self.exit_future, self.PROGRAM_TIMEOUT))
         except asyncio.TimeoutError:
             pass
-        yield from self.protocol.close()
+        # Send a TERMINATE message back 
+        message = message_pb2.PrexMessage()
+        message.type = message_pb2.PrexMessage.TERMINATE
+        try:
+            yield from self.protocol.send(message.SerializeToString())
+        except websockets.exceptions.ConnectionClosed:
+            pass
         shutil.rmtree(self.tmpdir)
-        logging.info('Closed protocol, subprocess.')
+        logging.info('Process termination cleanup complete.')
 
     @asyncio.coroutine
     def handle_io(self, payload):

@@ -55,8 +55,12 @@ class SimpleTerm():
                     image = message_pb2.Image()
                     image.ParseFromString(msg.payload)
                     print('Received {} bytes of image data.'.format(len(image.payload)))
+                if msg.type == message_pb2.PrexMessage.TERMINATE:
+                    # The remote process terminated
+                    return
             except websockets.exceptions.ConnectionClosed:
                 return
+
     @asyncio.coroutine
     def send_io(self, data):
         message_data = message_pb2.Io()

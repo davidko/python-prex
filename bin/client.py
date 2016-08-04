@@ -10,7 +10,7 @@ import logging
 if sys.version_info < (3,4,4):
     asyncio.ensure_future = asyncio.async
 
-#logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG)
 code = """
 print("Hello!")
 var = input("Enter some input: ")
