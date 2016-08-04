@@ -80,6 +80,10 @@ class _Connection():
         logging.info('Load program. Filename: ' + obj.filename) 
         logging.info('Code: ' + obj.code)
         logging.info('argv: ' + str(obj.argv))
+        logging.info('interpreter: ' + str(obj.interpreter))
+        interp = obj.interpreter
+        if len(interp) == 0:
+            interp = 'python3'
         # Save the code to a temporary dir
         tmpdir = tempfile.mkdtemp()
         self.tmpdir = tmpdir
@@ -96,7 +100,7 @@ class _Connection():
             exit_future = asyncio.Future()
             self.exit_future = exit_future
             logging.info('Starting subprocess...')
-            args = ['python3', filepath]
+            args = [interp, filepath]
             for arg in obj.argv:
                 args += [arg]
             create = loop.subprocess_exec(
