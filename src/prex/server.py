@@ -49,6 +49,7 @@ class _Connection():
                 yield from self.consumer_handler(message)
             except websockets.exceptions.ConnectionClosed:
                 yield from self.handle_terminate(None)
+                yield from self.handle_disconnect()
                 return
     
     @asyncio.coroutine
@@ -75,6 +76,9 @@ class _Connection():
     
     @asyncio.coroutine   
     def handle_load_program(self, payload):
+        # First, check to see if a program is already running. If so, terminate
+        # the old process first.
+        yield from self.handle_terminate(None)
         obj = message_pb2.LoadProgram()
         obj.ParseFromString(payload)
         logging.info('Load program. Filename: ' + obj.filename) 
@@ -147,6 +151,9 @@ class _Connection():
         if self.exec_transport is not None:
             self.exec_transport.kill()
             self.exec_transport = None
+
+    @asyncio.coroutine
+    def handle_disconnect(self):
         try:
             del self._server.connections[self.uri]
         except KeyError:
