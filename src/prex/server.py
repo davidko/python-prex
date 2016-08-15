@@ -39,6 +39,7 @@ class _Connection():
         self._server = server
         self.protocol = protocol
         self.uri = uri
+        self.exec_transport = None
 
     @asyncio.coroutine
     def consumer(self):    
