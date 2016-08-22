@@ -132,7 +132,10 @@ class _Connection():
             yield from self.protocol.send(message.SerializeToString())
         except websockets.exceptions.ConnectionClosed:
             pass
-        shutil.rmtree(self.tmpdir)
+        try:
+            shutil.rmtree(self.tmpdir)
+        except FileNotFoundError:
+            pass
         logging.info('Process termination cleanup complete.')
 
     @asyncio.coroutine
