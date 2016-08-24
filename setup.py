@@ -13,7 +13,7 @@ README = codecs.open(os.path.join(here, 'README.txt'), encoding='utf8').read()
 setup (name = 'prex',
        author = 'David Ko',
        author_email = 'david@barobo.com',
-       version = '0.0.8',
+       version = '0.0.9',
        description = "Execute Python scripts on a remote sandbox",
        long_description = README,
        package_dir = {'':'src'},
