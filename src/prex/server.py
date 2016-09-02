@@ -105,7 +105,11 @@ class _Connection():
         exit_future = asyncio.Future()
         self.exit_future = exit_future
         logging.info('Starting subprocess...')
-        args = [interp, filepath]
+        if interp.find('python') >= 0:
+            args = [interp, '-u', filepath]
+        else:
+            args = [interp, filepath]
+
         for arg in obj.argv:
             args += [arg]
         create = loop.subprocess_exec(
@@ -114,7 +118,8 @@ class _Connection():
             env={
                  'PREX_IPC_PORT':str(self.ipc_server.port),
                  'PATH':os.environ['PATH'],
-                })
+                },
+            )
         self.exec_transport, self.exec_protocol = yield from create
         asyncio.ensure_future(self.check_program_end())
 
