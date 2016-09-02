@@ -2,18 +2,25 @@
 
 import codecs
 import os
+import re
 from setuptools import setup
 import sys
 
 if sys.version_info < (3, 4, 2):
     raise Exception('Python 3.4.2 or higher is required to use prex.')
 
+version = re.search(
+    '^__version__\s*=\s*"(.*)"',
+    open('src/prex/server.py').read(),
+    re.M
+    ).group(1)
+
 here = os.path.abspath(os.path.dirname(__file__))
 README = codecs.open(os.path.join(here, 'README.txt'), encoding='utf8').read()
 setup (name = 'prex',
        author = 'David Ko',
        author_email = 'david@barobo.com',
-       version = '0.0.10',
+       version = version, 
        description = "Execute Python scripts on a remote sandbox",
        long_description = README,
        package_dir = {'':'src'},

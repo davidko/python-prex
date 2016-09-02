@@ -18,6 +18,16 @@ class SimpleTerm():
             websocket = yield from websockets.connect(uri)
             self.ws_protocol = websocket
 
+            # Get the remote version string
+            message = message_pb2.PrexMessage()
+            message.type = message_pb2.PrexMessage.VERSION
+            yield from websocket.send(message.SerializeToString())
+            payload = yield from self.ws_protocol.recv()
+            message = message_pb2.PrexMessage()
+            message.ParseFromString(payload)
+            assert( message.type == message_pb2.PrexMessage.VERSION )
+            print( 'Prex server version: {}'.format(message.payload.decode()) )
+
             message = message_pb2.PrexMessage()
             message.type = message_pb2.PrexMessage.LOAD_PROGRAM
 

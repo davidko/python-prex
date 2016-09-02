@@ -7,6 +7,7 @@ message PrexMessage {
         IMAGE = 2;
         TERMINATE=3;
         TERMINATE_ALL=4;
+        VERSION=5;
     }
 
     MessageType type = 1;

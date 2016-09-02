@@ -2,6 +2,8 @@
 
 __all__ = ['Server']
 
+__version__ = "0.0.10"
+
 import asyncio
 import functools
 import logging
@@ -71,9 +73,17 @@ class _Connection():
             message_pb2.PrexMessage.IMAGE : self.handle_image,
             message_pb2.PrexMessage.TERMINATE : self.handle_terminate,
             message_pb2.PrexMessage.TERMINATE_ALL : self.handle_terminate_all,
+            message_pb2.PrexMessage.VERSION : self.handle_version,
         }
 
         yield from handlers[msg.type](msg.payload)
+
+    @asyncio.coroutine
+    def handle_version(self, payload):
+        packet = message_pb2.PrexMessage()
+        packet.type = message_pb2.PrexMessage.VERSION
+        packet.payload = __version__.encode()
+        asyncio.ensure_future(self.protocol.send(packet.SerializeToString()))
     
     @asyncio.coroutine   
     def handle_load_program(self, payload):
