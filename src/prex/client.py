@@ -13,7 +13,7 @@ class SimpleTerm():
         pass
 
     @asyncio.coroutine
-    def run(self, uri, code="print('Hello, world!')", argv=[]):
+    def run(self, uri, code="print('Hello, world!')", interp='python3', filename='hello.py', argv=[]):
         try:
             websocket = yield from websockets.connect(uri)
             self.ws_protocol = websocket
@@ -22,8 +22,9 @@ class SimpleTerm():
             message.type = message_pb2.PrexMessage.LOAD_PROGRAM
 
             message_program = message_pb2.LoadProgram()
-            message_program.filename = 'hello.py'
+            message_program.filename = filename
             message_program.code = code
+            message_program.interpreter = interp
             for arg in argv:
                 new_arg = message_program.argv.append(arg)
             message.payload = message_program.SerializeToString()

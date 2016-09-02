@@ -89,28 +89,87 @@ class _Connection():
         interp = obj.interpreter
         if len(interp) == 0:
             interp = 'python3'
+
+        interp_handlers = {
+            'python3': self.handle_run_python,
+            'cxx': self.handle_run_cxx
+        }
+
+        try:
+            yield from interp_handlers[interp](obj)
+        except KeyError:
+            yield from self.send_io(2, "Error: Unknown interpreter requested: {}".format(interp))
+
+    @asyncio.coroutine
+    def handle_run_python(self, payload_object):
         # Save the code to a temporary dir
         tmpdir = tempfile.mkdtemp()
         self.tmpdir = tmpdir
-        filepath = os.path.join(tmpdir, obj.filename)
+        filepath = os.path.join(tmpdir, payload_object.filename)
         logging.info('Opening temp file at:' + filepath)
 
         # Start the interprocess communications channel
         self.ipc_server = yield from _ChildProcessWsServer.create(self.protocol)
 
         with open(filepath, 'w') as f:
-            f.write(obj.code)
+            f.write(payload_object.code)
             f.flush()
         loop = asyncio.get_event_loop()
         exit_future = asyncio.Future()
         self.exit_future = exit_future
         logging.info('Starting subprocess...')
-        if interp.find('python') >= 0:
-            args = [interp, '-u', filepath]
-        else:
-            args = [interp, filepath]
+        args = ['python3', '-u', filepath]
 
-        for arg in obj.argv:
+        for arg in payload_object.argv:
+            args += [arg]
+        create = loop.subprocess_exec(
+            functools.partial(_ExecProtocol, exit_future, self.protocol),
+            *args,
+            env={
+                 'PREX_IPC_PORT':str(self.ipc_server.port),
+                 'PATH':os.environ['PATH'],
+                },
+            )
+        self.exec_transport, self.exec_protocol = yield from create
+        asyncio.ensure_future(self.check_program_end())
+
+    @asyncio.coroutine
+    def handle_run_cxx(self, payload_object):
+        # Save the code to a temporary dir
+        tmpdir = tempfile.mkdtemp()
+        self.tmpdir = tmpdir
+        filepath = os.path.join(tmpdir, payload_object.filename)
+        logging.info('Opening temp file at:' + filepath)
+
+        # Start the interprocess communications channel
+        self.ipc_server = yield from _ChildProcessWsServer.create(self.protocol)
+
+        with open(filepath, 'w') as f:
+            f.write(payload_object.code)
+            f.flush()
+
+        # Compile the damn thing
+        yield from self.send_io(1, b'Compiling...\n')
+        process = yield from asyncio.create_subprocess_exec(
+            "clang++", filepath, "-o", os.path.join(tmpdir, "a.out") )
+        output = yield from process.communicate()
+        if process.returncode:
+            yield from self.send_io(2, 
+                'Error encountered while compiling. Return code: {}'.format(process.returncode).encode() )
+            yield from self.send_io(2, output[0].encode())
+            yield from self.send_io(2, output[1].encode())
+            return
+
+        # Now run it
+        yield from self.send_io(1, b'Executing...\n')
+
+        loop = asyncio.get_event_loop()
+        exit_future = asyncio.Future()
+        self.exit_future = exit_future
+        logging.info('Starting subprocess...')
+
+        args = ['stdbuf', '-i0', '-o0', '-e0', os.path.join(tmpdir, 'a.out')]
+        for arg in payload_object.argv:
             args += [arg]
         create = loop.subprocess_exec(
             functools.partial(_ExecProtocol, exit_future, self.protocol),
@@ -180,6 +239,16 @@ class _Connection():
             k, i = self._server.connections.popitem()
             logging.info('Terminating uri: {}'.format(k))
             yield from i.handle_terminate(None)
+
+    @asyncio.coroutine
+    def send_io(self, fd, data):
+        msg = message_pb2.Io()
+        msg.type = fd
+        msg.data = data
+        packet = message_pb2.PrexMessage()
+        packet.type = message_pb2.PrexMessage.IO
+        packet.payload = msg.SerializeToString()
+        asyncio.ensure_future(self.protocol.send(packet.SerializeToString()))
 
 # This WS server receives communications from the child process. For instance,
 # the child process can send an image to the client application by sending it
