@@ -161,7 +161,7 @@ class _Connection():
         # Compile the damn thing
         yield from self.send_io(1, b'Compiling...\n')
         process = yield from asyncio.create_subprocess_exec(
-            "clang++", filepath, "-o", os.path.join(tmpdir, "a.out") )
+            "g++", "-I/include", filepath, "-o", os.path.join(tmpdir, "a.out"), "-llinkbot" )
         output = yield from process.communicate()
         if process.returncode:
             yield from self.send_io(2, 
