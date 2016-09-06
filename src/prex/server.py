@@ -171,8 +171,10 @@ class _Connection():
         if process.returncode:
             yield from self.send_io(2, 
                 'Error encountered while compiling. Return code: {}'.format(process.returncode).encode() )
-            yield from self.send_io(2, output[0].encode())
-            yield from self.send_io(2, output[1].encode())
+            if output[0]:
+                yield from self.send_io(2, output[0].encode())
+            if output[1]:
+                yield from self.send_io(2, output[1].encode())
             return
 
         # Now run it
