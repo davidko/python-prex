@@ -9,6 +9,7 @@ import functools
 import logging
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
 import websockets
@@ -166,15 +167,17 @@ class _Connection():
             "-I/include", 
             filepath, 
             "-o", os.path.join(tmpdir, "a.out"), 
-            "-llinkbot" )
+            "-llinkbot",
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
         output = yield from process.communicate()
         if process.returncode:
             yield from self.send_io(2, 
                 'Error encountered while compiling. Return code: {}'.format(process.returncode).encode() )
             if output[0]:
-                yield from self.send_io(2, output[0].encode())
+                yield from self.send_io(2, output[0])
             if output[1]:
-                yield from self.send_io(2, output[1].encode())
+                yield from self.send_io(2, output[1])
             return
 
         # Now run it
