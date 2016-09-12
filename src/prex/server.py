@@ -139,8 +139,7 @@ class _Connection():
             env={
                  'PREX_IPC_PORT':str(self.ipc_server.port),
                  'PATH':os.environ['PATH'],
-                },
-            )
+                })
         self.exec_transport, self.exec_protocol = yield from create
         asyncio.ensure_future(self.check_program_end())
 
@@ -197,8 +196,7 @@ class _Connection():
             env={
                  'PREX_IPC_PORT':str(self.ipc_server.port),
                  'PATH':os.environ['PATH'],
-                },
-            )
+                })
         self.exec_transport, self.exec_protocol = yield from create
         asyncio.ensure_future(self.check_program_end())
 
