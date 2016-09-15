@@ -234,7 +234,7 @@ class _Connection():
     @asyncio.coroutine
     def handle_terminate(self, payload):
         logging.info('Terminating process...')
-        if self.exec_transport is not None:
+        if self.exec_transport != None:
             try:
                 self.exec_transport.kill()
             except ProcessLookupError:
