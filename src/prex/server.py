@@ -257,13 +257,15 @@ class _Connection():
     @asyncio.coroutine
     def handle_terminate(self, payload):
         logging.info('Terminating process...')
-        if self.exec_transport is not None:
-            try:
-                self.exec_transport.kill()
-            except ProcessLookupError:
-                # Process was not running. Ignore
-                pass
-            self.exec_transport = None
+        try:
+            self.exec_transport.kill()
+        except ProcessLookupError:
+            # Process was not running. Ignore
+            pass
+        except AttributeError:
+            # exec_transport isn't valid. Ignore
+            pass
+        self.exec_transport = None
 
     @asyncio.coroutine
     def handle_disconnect(self):
