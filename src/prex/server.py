@@ -25,6 +25,12 @@ class Server():
         self = cls()
         self.server = yield from websockets.serve(self.ws_handler, host, port)
         self.connections = {}
+        # The process queue is in change of starting processes in a serial
+        # manner so that the dongles aren't suddenly overloaded.
+        self.process_queue = asyncio.Queue()
+        # start the queue pump
+        asyncio.ensure_future(self.process_queue_pump())
+        
         return self
 
     @asyncio.coroutine
@@ -33,6 +39,13 @@ class Server():
         connection = _Connection(self, protocol, uri)
         self.connections[protocol.remote_address] = connection
         yield from connection.consumer()
+
+    @asyncio.coroutine
+    def process_queue_pump(self):
+        while True:
+            process_future = yield from self.process_queue.get()
+            process_future.set_result(True)
+            yield from asyncio.sleep(0.5)
         
 class _Connection():
 
@@ -128,6 +141,11 @@ class _Connection():
         loop = asyncio.get_event_loop()
         exit_future = asyncio.Future()
         self.exit_future = exit_future
+        # Add ourselves to the process queue
+        queue_future = asyncio.Future()
+        yield from self._server.process_queue.put(queue_future)
+        yield from queue_future
+
         logging.info('Starting subprocess...')
         args = ['python3', '-u', filepath]
 
@@ -157,6 +175,11 @@ class _Connection():
         with open(filepath, 'w') as f:
             f.write(payload_object.code)
             f.flush()
+
+        # Add ourselves to the process queue
+        queue_future = asyncio.Future()
+        yield from self._server.process_queue.put(queue_future)
+        yield from queue_future
 
         # Compile the damn thing
         yield from self.send_io(1, b'Compiling...\n')
