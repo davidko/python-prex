@@ -280,8 +280,11 @@ class _Connection():
     def handle_terminate_all(self, payload):
         # First, we suspend all client programs
         for k, i in self._server.connections.items():
-            psProcess = psutil.Process(pid=i.exec_transport.get_pid())
-            psProcess.suspend()
+            try:
+                psProcess = psutil.Process(pid=i.exec_transport.get_pid())
+                psProcess.suspend()
+            except:
+                pass
         # Now we tell the daemon to emit a global kill
         d = linkbot.Daemon()
         d.ping()
