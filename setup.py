@@ -29,7 +29,9 @@ setup (name = 'prex',
        url = 'http://github.com/BaroboRobotics/prex',
        install_requires=[
            'protobuf>=3.0.0',
-           'websockets>=3.0.0',],
+           'websockets>=3.0.0',
+           'pylinkbot3>=3.1.7',
+           'psutil'],
        classifiers=[
            'Development Status :: 3 - Alpha',
            'Operating System :: OS Independent',

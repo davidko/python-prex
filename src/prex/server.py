@@ -6,8 +6,10 @@ __version__ = "0.1.3"
 
 import asyncio
 import functools
+import linkbot3 as linkbot
 import logging
 import os
+import psutil
 import shutil
 import subprocess
 import sys
@@ -276,6 +278,16 @@ class _Connection():
 
     @asyncio.coroutine
     def handle_terminate_all(self, payload):
+        # First, we suspend all client programs
+        for k, i in self._server.connections.items():
+            try:
+                psProcess = psutil.Process(pid=i.exec_transport.get_pid())
+                psProcess.suspend()
+            except:
+                pass
+        # Now we tell the daemon to emit a global kill
+        d = linkbot.Daemon()
+        d.ping()
         # terminate all other processes
         while len(self._server.connections) > 0:
             logging.info('Num Connections: {}'.format(len(self._server.connections)))
