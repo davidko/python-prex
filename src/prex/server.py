@@ -203,7 +203,8 @@ class _Connection():
             if output[1]:
                 yield from self.send_io(2, output[1])
             # Send a "terminate" message back
-            self.emit_terminate_message()
+            yield from self.emit_terminate_message()
+            yield from self.rm_tmp_dir()
             return
 
         # Now run it
