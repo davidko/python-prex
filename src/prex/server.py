@@ -202,6 +202,8 @@ class _Connection():
                 yield from self.send_io(2, output[0])
             if output[1]:
                 yield from self.send_io(2, output[1])
+            # Send a "terminate" message back
+            self.emit_terminate_message()
             return
 
         # Now run it
@@ -232,6 +234,11 @@ class _Connection():
                 asyncio.wait_for(self.exit_future, self.PROGRAM_TIMEOUT))
         except asyncio.TimeoutError:
             pass
+        yield from self.emit_terminate_message()
+        yield from self.rm_tmp_dir()
+
+    @asyncio.coroutine
+    def emit_terminate_message(self):
         # Send a TERMINATE message back 
         message = message_pb2.PrexMessage()
         message.type = message_pb2.PrexMessage.TERMINATE
@@ -239,6 +246,9 @@ class _Connection():
             yield from self.protocol.send(message.SerializeToString())
         except websockets.exceptions.ConnectionClosed:
             pass
+
+    @asyncio.coroutine
+    def rm_tmp_dir(self):
         try:
             shutil.rmtree(self.tmpdir)
         except FileNotFoundError:
