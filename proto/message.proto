@@ -1,4 +1,4 @@
-syntax = "proto3";
+syntax = "proto2";
 
 message PrexMessage {
     enum MessageType {
@@ -10,15 +10,15 @@ message PrexMessage {
         VERSION=5;
     }
 
-    MessageType type = 1;
-    bytes payload = 2;
+    optional MessageType type = 1;
+    optional bytes payload = 2;
 }
 
 message LoadProgram {
-    string filename = 1;
-    string code = 2;
+    optional string filename = 1;
+    optional string code = 2;
     repeated string argv = 3;
-    string interpreter = 4;
+    optional string interpreter = 4;
 }
 
 message Io {
@@ -27,11 +27,11 @@ message Io {
         STDOUT = 1;
         STDERR = 2;
     }
-    FD type = 1;
-    bytes data = 2;
+    optional FD type = 1;
+    optional bytes data = 2;
 }
 
 message Image {
-    bytes payload = 1;
-    string format = 2;
+    optional bytes payload = 1;
+    optional string format = 2;
 }

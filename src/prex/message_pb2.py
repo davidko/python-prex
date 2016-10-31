@@ -18,8 +18,8 @@ _sym_db = _symbol_database.Default()
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='message.proto',
   package='',
-  syntax='proto3',
-  serialized_pb=_b('\n\rmessage.proto\"\xa9\x01\n\x0bPrexMessage\x12&\n\x04type\x18\x01 \x01(\x0e\x32\x18.PrexMessage.MessageType\x12\x0f\n\x07payload\x18\x02 \x01(\x0c\"a\n\x0bMessageType\x12\x10\n\x0cLOAD_PROGRAM\x10\x00\x12\x06\n\x02IO\x10\x01\x12\t\n\x05IMAGE\x10\x02\x12\r\n\tTERMINATE\x10\x03\x12\x11\n\rTERMINATE_ALL\x10\x04\x12\x0b\n\x07VERSION\x10\x05\"P\n\x0bLoadProgram\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x0c\n\x04\x63ode\x18\x02 \x01(\t\x12\x0c\n\x04\x61rgv\x18\x03 \x03(\t\x12\x13\n\x0binterpreter\x18\x04 \x01(\t\"Q\n\x02Io\x12\x14\n\x04type\x18\x01 \x01(\x0e\x32\x06.Io.FD\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"\'\n\x02\x46\x44\x12\t\n\x05STDIN\x10\x00\x12\n\n\x06STDOUT\x10\x01\x12\n\n\x06STDERR\x10\x02\"(\n\x05Image\x12\x0f\n\x07payload\x18\x01 \x01(\x0c\x12\x0e\n\x06\x66ormat\x18\x02 \x01(\tb\x06proto3')
+  syntax='proto2',
+  serialized_pb=_b('\n\rmessage.proto\"\xa9\x01\n\x0bPrexMessage\x12&\n\x04type\x18\x01 \x01(\x0e\x32\x18.PrexMessage.MessageType\x12\x0f\n\x07payload\x18\x02 \x01(\x0c\"a\n\x0bMessageType\x12\x10\n\x0cLOAD_PROGRAM\x10\x00\x12\x06\n\x02IO\x10\x01\x12\t\n\x05IMAGE\x10\x02\x12\r\n\tTERMINATE\x10\x03\x12\x11\n\rTERMINATE_ALL\x10\x04\x12\x0b\n\x07VERSION\x10\x05\"P\n\x0bLoadProgram\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x0c\n\x04\x63ode\x18\x02 \x01(\t\x12\x0c\n\x04\x61rgv\x18\x03 \x03(\t\x12\x13\n\x0binterpreter\x18\x04 \x01(\t\"Q\n\x02Io\x12\x14\n\x04type\x18\x01 \x01(\x0e\x32\x06.Io.FD\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"\'\n\x02\x46\x44\x12\t\n\x05STDIN\x10\x00\x12\n\n\x06STDOUT\x10\x01\x12\n\n\x06STDERR\x10\x02\"(\n\x05Image\x12\x0f\n\x07payload\x18\x01 \x01(\x0c\x12\x0e\n\x06\x66ormat\x18\x02 \x01(\t')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -120,7 +120,7 @@ _PREXMESSAGE = _descriptor.Descriptor(
   ],
   options=None,
   is_extendable=False,
-  syntax='proto3',
+  syntax='proto2',
   extension_ranges=[],
   oneofs=[
   ],
@@ -172,7 +172,7 @@ _LOADPROGRAM = _descriptor.Descriptor(
   ],
   options=None,
   is_extendable=False,
-  syntax='proto3',
+  syntax='proto2',
   extension_ranges=[],
   oneofs=[
   ],
@@ -211,7 +211,7 @@ _IO = _descriptor.Descriptor(
   ],
   options=None,
   is_extendable=False,
-  syntax='proto3',
+  syntax='proto2',
   extension_ranges=[],
   oneofs=[
   ],
@@ -249,7 +249,7 @@ _IMAGE = _descriptor.Descriptor(
   ],
   options=None,
   is_extendable=False,
-  syntax='proto3',
+  syntax='proto2',
   extension_ranges=[],
   oneofs=[
   ],
