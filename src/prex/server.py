@@ -112,7 +112,7 @@ class _Connection():
         logging.info('Code: ' + obj.code)
         logging.info('argv: ' + str(obj.argv))
         logging.info('interpreter: ' + str(obj.interpreter))
-        interp = obj.interpreter.decode()
+        interp = obj.interpreter
         if len(interp) == 0:
             interp = 'python3'
 
