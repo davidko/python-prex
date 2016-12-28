@@ -118,7 +118,8 @@ class _Connection():
 
         interp_handlers = {
             'python3': self.handle_run_python,
-            'cxx': self.handle_run_cxx
+            'cxx': self.handle_run_cxx,
+            'ch': self.handle_run_ch,
         }
 
         try:
@@ -150,6 +151,43 @@ class _Connection():
 
         logging.info('Starting subprocess...')
         args = ['python3', '-u', filepath]
+
+        for arg in payload_object.argv:
+            args += [arg]
+        create = loop.subprocess_exec(
+            functools.partial(_ExecProtocol, exit_future, self.protocol),
+            *args,
+            env={
+                 'PREX_IPC_PORT':str(self.ipc_server.port),
+                 'PATH':os.environ['PATH'],
+                })
+        self.exec_transport, self.exec_protocol = yield from create
+        asyncio.ensure_future(self.check_program_end())
+
+    @asyncio.coroutine
+    def handle_run_ch(self, payload_object):
+        # Save the code to a temporary dir
+        tmpdir = tempfile.mkdtemp()
+        self.tmpdir = tmpdir
+        filepath = os.path.join(tmpdir, payload_object.filename)
+        logging.info('Opening temp file at:' + filepath)
+
+        # Start the interprocess communications channel
+        self.ipc_server = yield from _ChildProcessWsServer.create(self.protocol)
+
+        with open(filepath, 'w') as f:
+            f.write(payload_object.code)
+            f.flush()
+        loop = asyncio.get_event_loop()
+        exit_future = asyncio.Future()
+        self.exit_future = exit_future
+        # Add ourselves to the process queue
+        queue_future = asyncio.Future()
+        yield from self._server.process_queue.put(queue_future)
+        yield from queue_future
+
+        logging.info('Starting subprocess...')
+        args = ['ch', filepath]
 
         for arg in payload_object.argv:
             args += [arg]

@@ -20,6 +20,6 @@ print("You entered: ", var)
 term = prex.SimpleTerm()
 loop = asyncio.get_event_loop()
 loop.add_reader(sys.stdin, term.got_user_input)
-loop.run_until_complete(term.run('ws://localhost:43000', code))
+loop.run_until_complete(term.run('ws://linkbot-hub-0d616a.local:43000', code))
 loop.close()
 
