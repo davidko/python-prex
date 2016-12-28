@@ -197,6 +197,7 @@ class _Connection():
             env={
                  'PREX_IPC_PORT':str(self.ipc_server.port),
                  'PATH':os.environ['PATH'],
+                 'CHHOME':'/usr/local/ch7.5',
                 })
         self.exec_transport, self.exec_protocol = yield from create
         asyncio.ensure_future(self.check_program_end())
