@@ -112,7 +112,7 @@ class _Connection():
         logging.info('Code: ' + obj.code)
         logging.info('argv: ' + str(obj.argv))
         logging.info('interpreter: ' + str(obj.interpreter))
-        interp = obj.interpreter
+        interp = obj.interpreter.decode()
         if len(interp) == 0:
             interp = 'python3'
 
@@ -125,7 +125,7 @@ class _Connection():
         try:
             yield from interp_handlers[interp](obj)
         except KeyError:
-            yield from self.send_io(2, "Error: Unknown interpreter requested: {}".format(interp))
+            yield from self.send_io(2, bytes("Error: Unknown interpreter requested: {}".format(interp)))
 
     @asyncio.coroutine
     def handle_run_python(self, payload_object):
