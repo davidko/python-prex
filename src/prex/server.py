@@ -353,7 +353,7 @@ class _Connection():
         packet = message_pb2.PrexMessage()
         packet.type = message_pb2.PrexMessage.IO
         packet.payload = msg.SerializeToString()
-        asyncio.ensure_future(self.protocol.send(packet.SerializeToString()))
+        yield from self.protocol.send(packet.SerializeToString())
 
 # This WS server receives communications from the child process. For instance,
 # the child process can send an image to the client application by sending it
