@@ -112,6 +112,7 @@ class _Connection():
         logging.info('Code: ' + obj.code)
         logging.info('argv: ' + str(obj.argv))
         logging.info('interpreter: ' + str(obj.interpreter))
+        logging.info('env: ' + str(obj.env))
         interp = obj.interpreter
         if len(interp) == 0:
             interp = 'python3'
@@ -154,13 +155,20 @@ class _Connection():
 
         for arg in payload_object.argv:
             args += [arg]
+
+        env = {}
+        for e in payload_object.env:
+            key,value = e.split('=', 1)
+            env[key] = value
+        env.update(
+                {
+                 'PREX_IPC_PORT':str(self.ipc_server.port),
+                 'PATH':os.environ['PATH'],
+                } )
         create = loop.subprocess_exec(
             functools.partial(_ExecProtocol, exit_future, self.protocol),
             *args,
-            env={
-                 'PREX_IPC_PORT':str(self.ipc_server.port),
-                 'PATH':os.environ['PATH'],
-                })
+            env=env)
         self.exec_transport, self.exec_protocol = yield from create
         asyncio.ensure_future(self.check_program_end())
 
@@ -191,14 +199,22 @@ class _Connection():
 
         for arg in payload_object.argv:
             args += [arg]
-        create = loop.subprocess_exec(
-            functools.partial(_ExecProtocol, exit_future, self.protocol),
-            *args,
-            env={
+
+        env = {}
+        for e in payload_object.env:
+            key,value = e.split('=', 1)
+            env[key] = value
+        env.update(
+                {
                  'PREX_IPC_PORT':str(self.ipc_server.port),
                  'PATH':os.environ['PATH'],
                  'CHHOME':'/usr/local/ch7.5',
-                })
+                } )
+        create = loop.subprocess_exec(
+            functools.partial(_ExecProtocol, exit_future, self.protocol),
+            *args,
+            env=env
+            )
         self.exec_transport, self.exec_protocol = yield from create
         asyncio.ensure_future(self.check_program_end())
 
@@ -257,13 +273,21 @@ class _Connection():
         args = ['stdbuf', '-i0', '-o0', '-e0', os.path.join(tmpdir, 'a.out')]
         for arg in payload_object.argv:
             args += [arg]
+
+        env = {}
+        for e in payload_object.env:
+            key,value = e.split('=', 1)
+            env[key] = value
+        env.update(
+                {
+                 'PREX_IPC_PORT':str(self.ipc_server.port),
+                 'PATH':os.environ['PATH'],
+                } )
         create = loop.subprocess_exec(
             functools.partial(_ExecProtocol, exit_future, self.protocol),
             *args,
-            env={
-                 'PREX_IPC_PORT':str(self.ipc_server.port),
-                 'PATH':os.environ['PATH'],
-                })
+            env=env
+            )
         self.exec_transport, self.exec_protocol = yield from create
         asyncio.ensure_future(self.check_program_end())
 

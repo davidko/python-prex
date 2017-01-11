@@ -19,6 +19,7 @@ message LoadProgram {
     optional string code = 2;
     repeated string argv = 3;
     optional string interpreter = 4;
+    repeated string env = 5;
 }
 
 message Io {
