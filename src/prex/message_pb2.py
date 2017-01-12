@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='message.proto',
   package='',
   syntax='proto2',
-  serialized_pb=_b('\n\rmessage.proto\"\xa9\x01\n\x0bPrexMessage\x12&\n\x04type\x18\x01 \x01(\x0e\x32\x18.PrexMessage.MessageType\x12\x0f\n\x07payload\x18\x02 \x01(\x0c\"a\n\x0bMessageType\x12\x10\n\x0cLOAD_PROGRAM\x10\x00\x12\x06\n\x02IO\x10\x01\x12\t\n\x05IMAGE\x10\x02\x12\r\n\tTERMINATE\x10\x03\x12\x11\n\rTERMINATE_ALL\x10\x04\x12\x0b\n\x07VERSION\x10\x05\"P\n\x0bLoadProgram\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x0c\n\x04\x63ode\x18\x02 \x01(\t\x12\x0c\n\x04\x61rgv\x18\x03 \x03(\t\x12\x13\n\x0binterpreter\x18\x04 \x01(\t\"Q\n\x02Io\x12\x14\n\x04type\x18\x01 \x01(\x0e\x32\x06.Io.FD\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"\'\n\x02\x46\x44\x12\t\n\x05STDIN\x10\x00\x12\n\n\x06STDOUT\x10\x01\x12\n\n\x06STDERR\x10\x02\"(\n\x05Image\x12\x0f\n\x07payload\x18\x01 \x01(\x0c\x12\x0e\n\x06\x66ormat\x18\x02 \x01(\t')
+  serialized_pb=_b('\n\rmessage.proto\"\xa9\x01\n\x0bPrexMessage\x12&\n\x04type\x18\x01 \x01(\x0e\x32\x18.PrexMessage.MessageType\x12\x0f\n\x07payload\x18\x02 \x01(\x0c\"a\n\x0bMessageType\x12\x10\n\x0cLOAD_PROGRAM\x10\x00\x12\x06\n\x02IO\x10\x01\x12\t\n\x05IMAGE\x10\x02\x12\r\n\tTERMINATE\x10\x03\x12\x11\n\rTERMINATE_ALL\x10\x04\x12\x0b\n\x07VERSION\x10\x05\"]\n\x0bLoadProgram\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x0c\n\x04\x63ode\x18\x02 \x01(\t\x12\x0c\n\x04\x61rgv\x18\x03 \x03(\t\x12\x13\n\x0binterpreter\x18\x04 \x01(\t\x12\x0b\n\x03\x65nv\x18\x05 \x03(\t\"Q\n\x02Io\x12\x14\n\x04type\x18\x01 \x01(\x0e\x32\x06.Io.FD\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"\'\n\x02\x46\x44\x12\t\n\x05STDIN\x10\x00\x12\n\n\x06STDOUT\x10\x01\x12\n\n\x06STDERR\x10\x02\"(\n\x05Image\x12\x0f\n\x07payload\x18\x01 \x01(\x0c\x12\x0e\n\x06\x66ormat\x18\x02 \x01(\t')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -84,8 +84,8 @@ _IO_FD = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=313,
-  serialized_end=352,
+  serialized_start=326,
+  serialized_end=365,
 )
 _sym_db.RegisterEnumDescriptor(_IO_FD)
 
@@ -164,6 +164,13 @@ _LOADPROGRAM = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='env', full_name='LoadProgram.env', index=4,
+      number=5, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -177,7 +184,7 @@ _LOADPROGRAM = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=189,
-  serialized_end=269,
+  serialized_end=282,
 )
 
 
@@ -215,8 +222,8 @@ _IO = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=271,
-  serialized_end=352,
+  serialized_start=284,
+  serialized_end=365,
 )
 
 
@@ -253,8 +260,8 @@ _IMAGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=354,
-  serialized_end=394,
+  serialized_start=367,
+  serialized_end=407,
 )
 
 _PREXMESSAGE.fields_by_name['type'].enum_type = _PREXMESSAGE_MESSAGETYPE
