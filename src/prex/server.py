@@ -195,7 +195,7 @@ class _Connection():
         yield from queue_future
 
         logging.info('Starting subprocess...')
-        args = ['ch', filepath]
+        args = ['ch', '-u', filepath]
 
         for arg in payload_object.argv:
             args += [arg]
