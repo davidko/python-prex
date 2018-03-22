@@ -30,7 +30,7 @@ setup (name = 'prex',
        install_requires=[
            'protobuf>=3.0.0',
            'websockets>=3.0.0',
-           'pylinkbot3>=3.1.7',
+           'pylinkbot3>=3.1.7,<3.2.0',
            'psutil'],
        classifiers=[
            'Development Status :: 3 - Alpha',
